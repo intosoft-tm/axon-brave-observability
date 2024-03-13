@@ -1,6 +1,6 @@
 ---
 name: Build & Test & Publish
-on: [workflow_dispatch]
+on: [push, pull_request]
 
 jobs:
   build-verify-publish:
@@ -22,9 +22,7 @@ jobs:
       - name: Build and verify with Gradle
         uses: ./.github/actions/build-verify-gradle
 
-      - name: Build and publish with Docker
-        uses: ./.github/actions/build-publish-docker
-        with:
-          docker-file: docker/Dockerfile
-          docker-tag: latest
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish package
+        run: ./gradlew publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

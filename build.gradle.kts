@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 group = "me.tmarciniak"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.1"
 
 plugins {
     `java-library`
@@ -93,6 +93,10 @@ tasks {
         }
     }
 
+    // Empty for now, required by github.com action
+    register<Test>("integrationTest")
+    register<Test>("archUnitTest")
+
     bootJar {
         enabled = false
     }
@@ -115,15 +119,21 @@ java {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "me.tmarciniak"
-            artifactId = "axon-brave-observability"
-            version = "0.0.1"
-
             from(components["java"])
         }
     }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Tomasz-Marciniak/axon-brave-observability")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
-    
+
 
 configure<KtlintExtension> {
     filter { exclude { it.file.path.startsWith(layout.buildDirectory.asFile.get().path) } }
