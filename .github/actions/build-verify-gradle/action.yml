@@ -1,0 +1,25 @@
+name: 'Build and verify with Gradle'
+runs:
+  using: "composite"
+  steps:
+    - name: Build with Gradle
+      shell: bash
+      run: ./gradlew clean build -x check
+
+    - name: Run Arch Unit Tests
+      shell: bash
+      run: ./gradlew archUnitTest
+
+    - name: Run Test
+      shell: bash
+      run: ./gradlew test
+
+    - name: Run Integration Test
+      shell: bash
+      run: ./gradlew integrationTest
+
+    - name: Archive test reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: tests-report
+        path: ./build/reports/tests

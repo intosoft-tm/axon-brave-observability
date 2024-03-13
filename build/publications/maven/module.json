@@ -1,0 +1,222 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "me.tmarciniak",
+    "module": "axon-brave-observability",
+    "version": "0.0.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.5"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 20,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "files": [
+        {
+          "name": "axon-brave-observability-0.0.1.jar",
+          "url": "axon-brave-observability-0.0.1.jar",
+          "size": 35566,
+          "sha512": "df6bd56209f0b222a3996954897af2388f752df50ed216f7f3061ad55569f52954d7a84a9457256b853d252f59ba75a0d10127d664d0c0dfbd1b99e5d6079e10",
+          "sha256": "0f3a5f4b48a429b8f4e4f2aba5aa2939d6bf09f0ebdc3af8522bd8db7409b9f0",
+          "sha1": "339f9a1757041c3033e5f13075f74fe97091da27",
+          "md5": "cd67a9d90556bfd48a05bb0c05003639"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 20,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.google.devtools.ksp",
+          "module": "symbol-processing-api",
+          "version": {
+            "requires": "1.9.22-1.0.17"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.module",
+          "module": "jackson-module-kotlin",
+          "version": {
+            "requires": "2.16.1"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-actuator"
+        },
+        {
+          "group": "org.axonframework",
+          "module": "axon-spring-boot-starter",
+          "version": {
+            "requires": "4.9.2"
+          }
+        },
+        {
+          "group": "org.axonframework.extensions.reactor",
+          "module": "axon-reactor-spring-boot-starter",
+          "version": {
+            "requires": "4.9.0"
+          }
+        },
+        {
+          "group": "org.axonframework",
+          "module": "axon-micrometer",
+          "version": {
+            "requires": "4.9.2"
+          }
+        },
+        {
+          "group": "org.yaml",
+          "module": "snakeyaml",
+          "version": {
+            "requires": "2.2"
+          }
+        },
+        {
+          "group": "io.axoniq.console",
+          "module": "console-framework-client-spring-boot-starter",
+          "version": {
+            "requires": "1.4.0"
+          }
+        },
+        {
+          "group": "io.micrometer",
+          "module": "micrometer-tracing-bridge-brave",
+          "version": {
+            "requires": "1.2.3"
+          }
+        },
+        {
+          "group": "io.zipkin.reporter2",
+          "module": "zipkin-reporter-brave",
+          "version": {
+            "requires": "3.3.0"
+          }
+        },
+        {
+          "group": "jakarta.validation",
+          "module": "jakarta.validation-api",
+          "version": {
+            "requires": "3.0.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-reflect",
+          "version": {
+            "requires": "1.9.22"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.9.22"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-reactor",
+          "version": {
+            "requires": "1.8.0"
+          }
+        },
+        {
+          "group": "io.github.oshai",
+          "module": "kotlin-logging-jvm",
+          "version": {
+            "requires": "6.0.3"
+          }
+        },
+        {
+          "group": "io.projectreactor.kotlin",
+          "module": "reactor-kotlin-extensions",
+          "version": {
+            "requires": "1.2.2"
+          }
+        },
+        {
+          "group": "io.micrometer",
+          "module": "micrometer-registry-prometheus",
+          "version": {
+            "requires": "1.12.3"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "axon-brave-observability-0.0.1.jar",
+          "url": "axon-brave-observability-0.0.1.jar",
+          "size": 35566,
+          "sha512": "df6bd56209f0b222a3996954897af2388f752df50ed216f7f3061ad55569f52954d7a84a9457256b853d252f59ba75a0d10127d664d0c0dfbd1b99e5d6079e10",
+          "sha256": "0f3a5f4b48a429b8f4e4f2aba5aa2939d6bf09f0ebdc3af8522bd8db7409b9f0",
+          "sha1": "339f9a1757041c3033e5f13075f74fe97091da27",
+          "md5": "cd67a9d90556bfd48a05bb0c05003639"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "axon-brave-observability-0.0.1-javadoc.jar",
+          "url": "axon-brave-observability-0.0.1-javadoc.jar",
+          "size": 261,
+          "sha512": "85496e9b354617bcd8be1f0c715206b3da3dcfde5fba7838fc4a4dba789102d4235d9d62214af678270f9061113f5cf5748fd29a482aa60f4cc6c657f15e34e6",
+          "sha256": "c4579bf353edf4bc8d061109ee5a050e3333704879f23f46bd685ca35b15f86c",
+          "sha1": "28db91151994d81306210d1c75c85c2f7e498f93",
+          "md5": "6b9b36029baca40977439bb800e3f7e1"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "axon-brave-observability-0.0.1-sources.jar",
+          "url": "axon-brave-observability-0.0.1-sources.jar",
+          "size": 7918,
+          "sha512": "50765b235a111175bd5f34d1c369deab5341f4cb8943fea8119dcd6e0104a9bb812727f41165a6a3fac74fd5df192ce4952a3f6405c996cfabef78b08fe9d21b",
+          "sha256": "4e0e18f5d1f1a5a7122ac2a530bc3b75fbf8fe02fa978da8d3d1add0db98c7c9",
+          "sha1": "60e0bd17a8ee2876cb24491517db23c1445582b2",
+          "md5": "068f4bb378e8b03753a63a43ed23bb6f"
+        }
+      ]
+    }
+  ]
+}
