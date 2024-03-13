@@ -1,0 +1,30 @@
+---
+name: Build & Test & Publish
+on: [workflow_dispatch]
+
+jobs:
+  build-verify-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+          cache: gradle
+
+      - name: Build and verify with Gradle
+        uses: ./.github/actions/build-verify-gradle
+
+      - name: Build and publish with Docker
+        uses: ./.github/actions/build-publish-docker
+        with:
+          docker-file: docker/Dockerfile
+          docker-tag: latest
+          github-token: ${{ secrets.GITHUB_TOKEN }}
