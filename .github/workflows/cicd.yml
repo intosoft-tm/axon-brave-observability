@@ -1,0 +1,25 @@
+name: Axon Brave Observability Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches:
+      - 'main'
+
+permissions:
+  contents: write
+  pull-requests: write
+  packages: write
+
+jobs:
+  gradle-pipeline:
+    name: ▶️
+    uses: Tomasz-Marciniak/github-actions-starter/.github/workflows/gradle.lib.yml@main
+    with:
+      actions-branch: main
+    secrets: inherit
