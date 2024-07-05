@@ -1,8 +1,9 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
+val currentVersion: String by project
+
 group = "me.tmarciniak"
-version = "0.0.1"
+version = currentVersion
 
 plugins {
     `java-library`
@@ -26,8 +27,18 @@ repositories {
     mavenCentral()
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xlint:unchecked")
+    }
+    jvmToolchain(21)
+}
+
 java {
-    sourceCompatibility = JavaVersion.VERSION_20
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    withJavadocJar()
+    withSourcesJar()
 }
 
 dependencies {
@@ -81,13 +92,6 @@ configurations {
 }
 
 tasks {
-    withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict", "-Xlint:unchecked")
-            jvmTarget = JavaVersion.VERSION_20.majorVersion
-        }
-    }
-
     withType<Test> {
         useJUnitPlatform {
         }
@@ -109,11 +113,6 @@ tasks {
         enabled = true
         archiveClassifier.set("")
     }
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
 }
 
 publishing {
@@ -138,3 +137,4 @@ publishing {
 configure<KtlintExtension> {
     filter { exclude { it.file.path.startsWith(layout.buildDirectory.asFile.get().path) } }
 }
+
