@@ -19,7 +19,7 @@ enum class AxonInternalObservation : ObservationDocumentation {
 
     enum class SenderLowCardinalityTags : KeyName {
         INTERNAL_PAYLOAD {
-            override fun asString() = "spring.axon.handler.payload"
+            override fun asString() = "reactor.axon.internal.payload"
         },
 
         INTERNAL_OPERATION {
