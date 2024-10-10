@@ -1,77 +1,97 @@
 package me.tmarciniak.axon.observability
 
-import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.micrometer.observation.Observation
-import io.micrometer.observation.ObservationRegistry
+import io.micrometer.observation.tck.TestObservationRegistry
+import io.micrometer.observation.tck.TestObservationRegistryAssert
 import io.mockk.spyk
 import io.mockk.verify
 
-class BraveSpanTest : BehaviorSpec({
+class BraveSpanTest :
+    BehaviorSpec({
 
-    isolationMode = IsolationMode.InstancePerLeaf
+        context("observation registry is available") {
+            val observationRegistry = TestObservationRegistry.create()
 
-    context("observation registry is available") {
-        val observationRegistry = ObservationRegistry.create()
+            given("observation is created") {
 
-        given("observation is created") {
-            val observation = spyk(Observation.createNotStarted("sample-observation", observationRegistry))
+                `when`("span is started") {
+                    val observation = spyk(Observation.createNotStarted("sample-observation", observationRegistry))
 
-            `when`("span is started") {
-                BraveSpan(observation)
-                    .start()
+                    BraveSpan(observation)
+                        .start()
 
-                then("it starts observation but does not make it current") {
-                    verify(exactly = 1) { observation.start() }
-                    observationRegistry.currentObservation.shouldBeNull()
+                    then("it starts observation but does not make it current") {
+                        verify(exactly = 1) { observation.start() }
+
+                        TestObservationRegistryAssert
+                            .assertThat(observationRegistry)
+                            .doesNotHaveRemainingCurrentObservationSameAs(observation)
+                    }
                 }
-            }
 
-            `when`("span is started and made active") {
-                BraveSpan(observation)
-                    .start()
-                    .makeCurrent()
+                `when`("span is started and made active") {
+                    val observation = spyk(Observation.createNotStarted("sample-observation", observationRegistry))
 
-                then("it starts observation and makes it current") {
-                    verify(exactly = 1) { observation.start() }
-                    observationRegistry.currentObservation.shouldNotBeNull()
+                    BraveSpan(observation)
+                        .start()
+                        .makeCurrent()
+                        .use {}
+
+                    then("it starts observation and makes it current") {
+                        verify(exactly = 1) { observation.start() }
+
+                        TestObservationRegistryAssert
+                            .assertThat(observationRegistry)
+                            .hasObservationWithNameEqualTo("sample-observation")
+                    }
                 }
-            }
 
-            `when`("span is started and ended") {
-                BraveSpan(observation)
-                    .start()
-                    .end()
+                `when`("span is started and ended") {
+                    val observation = spyk(Observation.createNotStarted("sample-observation", observationRegistry))
 
-                then("it stops observation but does not close the scope") {
-                    verify(exactly = 1) { observation.stop() }
-                    observationRegistry.currentObservation!!.openScope().shouldNotBeNull()
+                    BraveSpan(observation)
+                        .start()
+                        .end()
+
+                    then("it stops observation but does not close the scope") {
+                        verify(exactly = 1) { observation.stop() }
+
+                        TestObservationRegistryAssert
+                            .assertThat(observationRegistry)
+                            .hasObservationWithNameEqualTo("sample-observation")
+                    }
                 }
-            }
 
-            `when`("span is started, made active and ended") {
-                BraveSpan(observation)
-                    .start()
-                    .also { it.makeCurrent() }
-                    .also { it.end() }
+                `when`("span is started, made active and ended") {
+                    val observation = spyk(Observation.createNotStarted("sample-observation", observationRegistry))
 
-                then("it ends span event when spans are still current") {
-                    verify(exactly = 1) { observation.stop() }
+                    BraveSpan(observation)
+                        .start()
+                        .also { it.makeCurrent().use { } }
+                        .also { it.end() }
+
+                    then("it ends span event when spans are still current") {
+                        verify(exactly = 1) { observation.stop() }
+
+                        TestObservationRegistryAssert
+                            .assertThat(observationRegistry)
+                            .doesNotHaveRemainingCurrentObservationSameAs(observation)
+                    }
                 }
-            }
-            `when`("span is started and exception is recorded") {
-                val exception = IllegalArgumentException("This is my exception message")
+                `when`("span is started and exception is recorded") {
+                    val observation = spyk(Observation.createNotStarted("sample-observation", observationRegistry))
 
-                BraveSpan(observation)
-                    .start()
-                    .recordException(exception)
+                    val exception = IllegalArgumentException("This is my exception message")
 
-                then("records exceptions on observation") {
-                    verify(exactly = 1) { observation.error(exception) }
+                    BraveSpan(observation)
+                        .start()
+                        .recordException(exception)
+
+                    then("records exceptions on observation") {
+                        verify(exactly = 1) { observation.error(exception) }
+                    }
                 }
             }
         }
-    }
-})
+    })
