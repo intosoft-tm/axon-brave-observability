@@ -8,13 +8,11 @@ import me.tmarciniak.axon.observability.observation.handler.AxonHandlerObservati
 import me.tmarciniak.axon.observability.observation.handler.AxonMessageHandlerContext
 import me.tmarciniak.axon.observability.observation.internal.AxonInternalObservation
 import me.tmarciniak.axon.observability.observation.internal.AxonMessageInternalContext
-import mu.KotlinLogging
 import org.axonframework.messaging.Message
 import org.axonframework.tracing.SpanAttributesProvider
 import org.axonframework.tracing.SpanFactory
+import java.util.function.Consumer
 import java.util.function.Supplier
-
-private val log = KotlinLogging.logger {}
 
 /**
  * @author Tomasz Marciniak
@@ -23,49 +21,88 @@ class BraveSpanFactory(private val observationRegistry: ObservationRegistry) : S
     private val spanAttributesProviders = mutableListOf<SpanAttributesProvider>()
 
     override fun createRootTrace(operationNameSupplier: Supplier<String>): BraveSpan =
-        BraveSpan(internalObservation(operationNameSupplier.get()))
+        BraveSpan(createInternalObservation(operationName = operationNameSupplier.get(), isRootTrace = true))
 
     override fun createHandlerSpan(
         operationNameSupplier: Supplier<String>,
         parentMessage: Message<*>,
         isChildTrace: Boolean,
         vararg linkedParents: Message<*>
-    ): BraveSpan = BraveSpan(handlerObservation(parentMessage, operationNameSupplier.get()))
+    ): BraveSpan =
+        BraveSpan(
+            createHandlerObservation(
+                message = parentMessage,
+                operationName = operationNameSupplier.get()
+            )
+                .also { addMessageAttributes(observation = it, message = parentMessage) }
+        )
 
     override fun createDispatchSpan(
         operationNameSupplier: Supplier<String>,
         parentMessage: Message<*>,
         vararg linkedSiblings: Message<*>
-    ): BraveSpan = BraveSpan(dispatcherObservation(parentMessage, operationNameSupplier.get()))
+    ): BraveSpan =
+        BraveSpan(
+            createDispatcherObservation(
+                operationName = operationNameSupplier.get(),
+                payloadType = parentMessage.payloadType.name
+            )
+                .also { addMessageAttributes(observation = it, message = parentMessage) }
+        )
 
     override fun createInternalSpan(operationNameSupplier: Supplier<String>): BraveSpan =
-        BraveSpan(internalObservation(operationNameSupplier.get()))
+        BraveSpan(createInternalObservation(operationName = operationNameSupplier.get()))
 
     override fun createInternalSpan(
         operationNameSupplier: Supplier<String>,
         message: Message<*>
-    ): BraveSpan = BraveSpan(internalObservation(operationNameSupplier.get(), message.payloadType.name))
+    ): BraveSpan =
+        BraveSpan(
+            createInternalObservation(
+                payloadName = message.payloadType.name,
+                operationName = operationNameSupplier.get()
+            )
+                .also { addMessageAttributes(it, message) }
+        )
 
     override fun <M : Message<*>> propagateContext(message: M): M =
-        (observationRegistry.currentObservation?.context as? AxonMessageDispatcherContext).let { context ->
-            context?.carrier?.let { message.javaClass.cast(message.andMetaData(it as MutableMap<String, *>)) }
-        } ?: message
+        getAxonMessageDispatcherContextCarrier()
+            .addMetadata(message)
+            .castToMessage(message)
 
     override fun registerSpanAttributeProvider(provider: SpanAttributesProvider): Unit =
-        spanAttributesProviders.add(provider).let { }
+        Unit.also { spanAttributesProviders.add(provider) }
 
-    private fun dispatcherObservation(
+    private fun getAxonMessageDispatcherContextCarrier(): MutableMap<String, Any>? =
+        (observationRegistry.currentObservation?.context as? AxonMessageDispatcherContext)?.carrier
+
+    private fun addMessageAttributes(
+        observation: Observation,
+        message: Message<*>?
+    ): Unit? = message?.let { addAttributes(it, observation) }
+
+    private fun addAttributes(
         message: Message<*>,
-        operationName: String
+        observation: Observation
+    ) = spanAttributesProviders.forEach(
+        Consumer { supplier: SpanAttributesProvider ->
+            val attributes = supplier.provideForMessage(message)
+            attributes.forEach { observation.lowCardinalityKeyValue(it.key, it.value) }
+        }
+    )
+
+    private fun createDispatcherObservation(
+        operationName: String,
+        payloadType: String
     ): Observation =
         AxonDispatcherObservation.DISPATCHER_OBSERVATION.observation(
             null,
             AxonDispatcherObservation.DefaultAxonDispatcherObservationConvention.INSTANCE,
-            { AxonMessageDispatcherContext(message, operationName) },
+            { AxonMessageDispatcherContext(payloadType, operationName) },
             observationRegistry
         )
 
-    private fun handlerObservation(
+    private fun createHandlerObservation(
         message: Message<*>,
         operationName: String
     ): Observation =
@@ -76,14 +113,20 @@ class BraveSpanFactory(private val observationRegistry: ObservationRegistry) : S
             observationRegistry
         )
 
-    private fun internalObservation(
+    private fun createInternalObservation(
+        payloadName: String? = null,
         operationName: String,
-        payloadName: String? = null
+        isRootTrace: Boolean = false
     ): Observation =
         AxonInternalObservation.INTERNAL_OBSERVATION.observation(
             null,
             AxonInternalObservation.DefaultAxonInternalObservationConvention.INSTANCE,
-            { AxonMessageInternalContext(operationName, payloadName) },
+            { AxonMessageInternalContext(payloadName, operationName, isRootTrace) },
             observationRegistry
         )
 }
+
+private fun <M : Message<*>> Message<out Any>?.castToMessage(message: M): M = message.javaClass.cast(this) ?: message
+
+private fun MutableMap<String, *>?.addMetadata(message: Message<*>): Message<out Any>? =
+    this?.let { message.andMetaData(this) }

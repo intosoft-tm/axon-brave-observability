@@ -15,7 +15,8 @@ enum class AxonDispatcherObservation : ObservationDocumentation {
         override fun getPrefix() = "reactor.axon.dispatcher"
 
         override fun getLowCardinalityKeyNames() = SenderLowCardinalityTags.entries.toTypedArray()
-    };
+    }
+    ;
 
     enum class SenderLowCardinalityTags : KeyName {
         DISPATCHER_PAYLOAD {
@@ -30,7 +31,7 @@ enum class AxonDispatcherObservation : ObservationDocumentation {
     class DefaultAxonDispatcherObservationConvention : AxonDispatcherObservationConvention {
         override fun getLowCardinalityKeyValues(context: AxonMessageDispatcherContext): KeyValues =
             KeyValues.of(
-                SenderLowCardinalityTags.DISPATCHER_PAYLOAD.withValue(context.payload),
+                SenderLowCardinalityTags.DISPATCHER_PAYLOAD.withValue(context.payloadType),
                 SenderLowCardinalityTags.DISPATCHER_OPERATION.withValue(context.operationName)
             )
 

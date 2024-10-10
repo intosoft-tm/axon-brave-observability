@@ -1,32 +1,31 @@
 [versions]
-axon-extensions-reactor = "4.9.0"
-axon-micrometer = "4.9.3"
-axon-spring-boot-starter = "4.9.3"
+axon-extensions-reactor = "4.10.0"
+axon-micrometer = "4.10.0"
+axon-spring-boot-starter = "4.10.0"
 com-github-ben-manes-versions = "0.51.0"
-com-google-devtools-ksp = "2.0.20-Beta1-1.0.22"
-io-axoniq-console-framework-client-spring-boot-starter = "1.5.1"
+com-google-devtools-ksp = "2.0.20-1.0.25"
+io-axoniq-console-framework-client-spring-boot-starter = "1.7.3"
 io-kotest = "5.9.1"
-io-micrometer-micrometer-tracing-test = "1.3.1"
-io-spring-dependency-management = "1.1.5"
-jackson-module-kotlin = "2.17.1"
+io-micrometer-micrometer-observation-test = "1.13.4"
+io-micrometer-micrometer-tracing-test = "1.3.4"
+io-mockk = "1.13.12"
+io-spring-dependency-management = "1.1.6"
+jackson-module-kotlin = "2.17.2"
 jakarta-validation-api = "3.1.0"
 kotest-extensions-spring = "1.3.0"
 kotest-extensions-testcontainers = "2.0.2"
 kotlin-logging-jvm = "7.0.0"
-kotlinx-coroutines-reactor = "1.9.0-RC"
-log4j-core = "3.0.0-beta2"
-micrometer-registry-prometheus = "1.13.1"
-micrometer-tracing-bridge-brave = "1.3.1"
-mockito-kotlin = "5.3.1"
+kotlinx-coroutines-reactor = "1.9.0"
+micrometer-registry-prometheus = "1.13.4"
+micrometer-tracing-bridge-brave = "1.3.4"
 nl-littlerobots-version-catalog-update = "0.8.4"
-org-jetbrains-annotations = "13.0"
-org-jetbrains-kotlin = "2.0.20-Beta1"
+org-jetbrains-kotlin = "2.0.20"
 org-jlleitschuh-gradle-ktlint = "12.1.1"
-org-springframework-boot = "3.3.1"
-reactor-kotlin-extensions = "1.2.2"
-reactor-test = "3.6.7"
-snakeyaml = "2.2"
-zipkin-reporter-brave = "3.4.0"
+org-springframework-boot = "3.3.3"
+reactor-kotlin-extensions = "1.2.3"
+reactor-test = "3.6.10"
+snakeyaml = "2.3"
+zipkin-reporter-brave = "3.4.1"
 
 [libraries]
 com-fasterxml-jackson-module-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-module-kotlin" }
@@ -38,22 +37,21 @@ io-kotest-extensions-kotest-extensions-testcontainers = { module = "io.kotest.ex
 io-kotest-kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "io-kotest" }
 io-kotest-kotest-property = { module = "io.kotest:kotest-property", version.ref = "io-kotest" }
 io-kotest-kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "io-kotest" }
+io-micrometer-micrometer-observation-test = { module = "io.micrometer:micrometer-observation-test", version.ref = "io-micrometer-micrometer-observation-test" }
 io-micrometer-micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus", version.ref = "micrometer-registry-prometheus" }
 io-micrometer-micrometer-tracing-bridge-brave = { module = "io.micrometer:micrometer-tracing-bridge-brave", version.ref = "micrometer-tracing-bridge-brave" }
 io-micrometer-micrometer-tracing-test = { module = "io.micrometer:micrometer-tracing-test", version.ref = "io-micrometer-micrometer-tracing-test" }
+io-mockk = { module = "io.mockk:mockk", version.ref = "io-mockk" }
 io-projectreactor-kotlin-reactor-kotlin-extensions = { module = "io.projectreactor.kotlin:reactor-kotlin-extensions", version.ref = "reactor-kotlin-extensions" }
 io-projectreactor-reactor-test = { module = "io.projectreactor:reactor-test", version.ref = "reactor-test" }
 io-zipkin-reporter2-zipkin-reporter-brave = { module = "io.zipkin.reporter2:zipkin-reporter-brave", version.ref = "zipkin-reporter-brave" }
 jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "jakarta-validation-api" }
-org-apache-logging-log4j-log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j-core" }
 org-axon-extensions-reactor-spring-boot-starter = { module = "org.axonframework.extensions.reactor:axon-reactor-spring-boot-starter", version.ref = "axon-extensions-reactor" }
 org-axon-micrometer = { module = "org.axonframework:axon-micrometer", version.ref = "axon-micrometer" }
 org-axon-spring-boot-starter = { module = "org.axonframework:axon-spring-boot-starter", version.ref = "axon-spring-boot-starter" }
-org-jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "org-jetbrains-annotations" }
-org-jetbrains-kotlin-kotlin-reflect = "org.jetbrains.kotlin:kotlin-reflect:2.0.20-Beta1"
-org-jetbrains-kotlin-kotlin-stdlib-jdk8 = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.20-Beta1"
+org-jetbrains-kotlin-kotlin-reflect = "org.jetbrains.kotlin:kotlin-reflect:2.0.20"
+org-jetbrains-kotlin-kotlin-stdlib-jdk8 = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.20"
 org-jetbrains-kotlinx-kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlinx-coroutines-reactor" }
-org-mockito-kotlin-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
 org-springframework-boot-spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 org-springframework-boot-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 org-springframework-boot-spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }

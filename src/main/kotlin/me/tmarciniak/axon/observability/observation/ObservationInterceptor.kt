@@ -1,4 +1,4 @@
-package me.tmarciniak.axon.observability
+package me.tmarciniak.axon.observability.observation
 
 import io.micrometer.observation.ObservationRegistry
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor
@@ -21,9 +21,9 @@ class ObservationInterceptor<T : Message<*>>(private val observationRegistry: Ob
     override fun handle(
         unitOfWork: UnitOfWork<out T>,
         interceptorChain: InterceptorChain
-    ): Any = handleResult(interceptorChain.proceed())
+    ): Any = enrichResultWithObservationIfReturnedResultIsFlux(interceptorChain.proceed())
 
-    private fun handleResult(returnResult: Any): Any =
+    private fun enrichResultWithObservationIfReturnedResultIsFlux(returnResult: Any): Any =
         (returnResult as? Flux<*>)?.let {
             observationRegistry.currentObservation?.let {
                 returnResult.contextWrite { context -> context.put(ObservationThreadLocalAccessor.KEY, it) }
