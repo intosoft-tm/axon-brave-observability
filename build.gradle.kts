@@ -1,3 +1,4 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 val currentVersion: String by project
@@ -18,6 +19,7 @@ plugins {
     alias(libs.plugins.org.jlleitschuh.gradle.ktlint)
     alias(libs.plugins.org.springframework.boot)
 
+    alias(libs.plugins.nl.littlerobots.version.catalog.update)
     alias(libs.plugins.io.spring.dependency.management)
 }
 
@@ -29,7 +31,7 @@ repositories {
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xlint:unchecked")
+        freeCompilerArgs = listOf("-Xjsr305=strict")
     }
     jvmToolchain(21)
 }
@@ -83,8 +85,8 @@ dependencies {
     testImplementation(libs.io.kotest.extensions.kotest.extensions.testcontainers)
 
     testImplementation(libs.io.micrometer.micrometer.tracing.test)
-
-    testImplementation(libs.org.mockito.kotlin.mockito.kotlin)
+    testImplementation(libs.io.micrometer.micrometer.observation.test)
+    testImplementation(libs.io.mockk)
 }
 
 configurations {
@@ -92,22 +94,15 @@ configurations {
 }
 
 tasks {
-    withType<Test> {
-        useJUnitPlatform {
-        }
-    }
+    withType<DependencyUpdatesTask> { rejectVersionIf { isNonStable(candidate.version) } }
+    withType<Test> { useJUnitPlatform {} }
 
-    // Empty for now, required by github.com action
+    // Empty for now, required by shared GitHub action
     register<Test>("integrationTest")
     register<Test>("archUnitTest")
 
-    bootJar {
-        enabled = false
-    }
-
-    bootRun {
-        enabled = false
-    }
+    bootJar { enabled = false }
+    bootRun { enabled = false }
 
     jar {
         enabled = true
@@ -124,7 +119,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Tomasz-Marciniak/axon-brave-observability")
+            url = uri("https://maven.pkg.github.com/intosoft-tm/axon-brave-observability")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
@@ -133,8 +128,13 @@ publishing {
     }
 }
 
-
 configure<KtlintExtension> {
     filter { exclude { it.file.path.startsWith(layout.buildDirectory.asFile.get().path) } }
 }
 
+fun isNonStable(version: String): Boolean {
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    val isStable = stableKeyword || regex.matches(version)
+    return isStable.not()
+}
