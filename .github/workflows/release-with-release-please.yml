@@ -1,0 +1,21 @@
+name: Release with Release Please
+
+on:
+  push:
+    branches:
+      - main
+  workflow_call:
+    secrets:
+      READ_WRITE_PACKAGES_GITHUB_TOKEN:
+        required: true
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  releaase:
+    name: ▶️
+    uses: intosoft-tm/github-actions-starter/.github/workflows/release-with-release-please.yml@main
+    secrets: inherit
