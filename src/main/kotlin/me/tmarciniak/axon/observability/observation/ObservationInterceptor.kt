@@ -13,8 +13,10 @@ import java.util.function.BiFunction
 /**
  * @author Tomasz Marciniak
  */
-class ObservationInterceptor<T : Message<*>>(private val observationRegistry: ObservationRegistry) :
-    MessageDispatchInterceptor<T>, MessageHandlerInterceptor<T> {
+class ObservationInterceptor<T : Message<*>>(
+    private val observationRegistry: ObservationRegistry
+) : MessageDispatchInterceptor<T>,
+    MessageHandlerInterceptor<T> {
     override fun handle(messages: List<T>) = BiFunction<Int, T, T> { _, message -> message }
 
     @Throws(Exception::class)
