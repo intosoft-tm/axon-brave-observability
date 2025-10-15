@@ -19,7 +19,5 @@ permissions:
 jobs:
   gradle-pipeline:
     name: ▶️
-    uses: intosoft-tm/github-actions-starter/.github/workflows/gradle.lib.yml@main
-    with:
-      actions-branch: main
+    uses: intosoft-tm/github-actions-starter/.github/workflows/java-lib-ci-with-gradle.yml@main
     secrets: inherit
