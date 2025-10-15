@@ -17,7 +17,9 @@ import java.util.function.Supplier
 /**
  * @author Tomasz Marciniak
  */
-class BraveSpanFactory(private val observationRegistry: ObservationRegistry) : SpanFactory {
+class BraveSpanFactory(
+    private val observationRegistry: ObservationRegistry
+) : SpanFactory {
     private val spanAttributesProviders = mutableListOf<SpanAttributesProvider>()
 
     override fun createRootTrace(operationNameSupplier: Supplier<String>): BraveSpan =
@@ -33,8 +35,7 @@ class BraveSpanFactory(private val observationRegistry: ObservationRegistry) : S
             createHandlerObservation(
                 message = parentMessage,
                 operationName = operationNameSupplier.get()
-            )
-                .also { addMessageAttributes(observation = it, message = parentMessage) }
+            ).also { addMessageAttributes(observation = it, message = parentMessage) }
         )
 
     override fun createDispatchSpan(
@@ -46,8 +47,7 @@ class BraveSpanFactory(private val observationRegistry: ObservationRegistry) : S
             createDispatcherObservation(
                 operationName = operationNameSupplier.get(),
                 payloadType = parentMessage.payloadType.name
-            )
-                .also { addMessageAttributes(observation = it, message = parentMessage) }
+            ).also { addMessageAttributes(observation = it, message = parentMessage) }
         )
 
     override fun createInternalSpan(operationNameSupplier: Supplier<String>): BraveSpan =
@@ -61,8 +61,7 @@ class BraveSpanFactory(private val observationRegistry: ObservationRegistry) : S
             createInternalObservation(
                 payloadName = message.payloadType.name,
                 operationName = operationNameSupplier.get()
-            )
-                .also { addMessageAttributes(it, message) }
+            ).also { addMessageAttributes(it, message) }
         )
 
     override fun <M : Message<*>> propagateContext(message: M): M =

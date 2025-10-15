@@ -77,12 +77,9 @@ dependencies {
 
     testImplementation(libs.io.projectreactor.reactor.test)
 
-    testImplementation(libs.io.kotest.kotest.runner.junit5)
-    testImplementation(libs.io.kotest.kotest.assertions.core)
-    testImplementation(libs.io.kotest.kotest.property)
-
-    testImplementation(libs.io.kotest.extensions.kotest.extensions.spring)
-    testImplementation(libs.io.kotest.extensions.kotest.extensions.testcontainers)
+    testImplementation(libs.io.kotest.runner.junit5)
+    testImplementation(libs.io.kotest.assertions.core)
+    testImplementation(libs.io.kotest.property)
 
     testImplementation(libs.io.micrometer.micrometer.tracing.test)
     testImplementation(libs.io.micrometer.micrometer.observation.test)

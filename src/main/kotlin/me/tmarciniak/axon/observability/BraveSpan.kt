@@ -11,7 +11,9 @@ import org.axonframework.tracing.SpanScope
  *
  * @author Tomasz Marciniak
  */
-class BraveSpan(private val observation: Observation) : Span {
+class BraveSpan(
+    private val observation: Observation
+) : Span {
     override fun start() = also { observation.start() }
 
     override fun makeCurrent(): SpanScope = observation.openScope().let { return SpanScope { it.close() } }
