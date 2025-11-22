@@ -7,8 +7,10 @@ import org.axonframework.messaging.Message
 /**
  * @author Tomasz Marciniak
  */
-class AxonMessageHandlerContext(message: Message<*>, val operationName: String) :
-    ReceiverContext<Message<*>>(
+class AxonMessageHandlerContext(
+    message: Message<*>,
+    val operationName: String
+) : ReceiverContext<Message<*>>(
         Propagator.Getter { carrier: Message<*>, key: String ->
             carrier.metaData[key] as String?
         }

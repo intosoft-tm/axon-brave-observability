@@ -56,7 +56,7 @@ dependencies {
     implementation(libs.org.yaml.snakeyaml)
 
     implementation(libs.io.axoniq.console.framework.client.spring.boot.starter)
-    implementation(libs.io.micrometer.micrometer.tracing.bridge.brave)
+    implementation(libs.io.micrometer.tracing.bridge.brave)
 
     implementation(libs.io.zipkin.reporter2.zipkin.reporter.brave)
 
@@ -70,22 +70,22 @@ dependencies {
     implementation(libs.io.github.oshai.kotlin.logging.jvm)
     implementation(libs.io.projectreactor.kotlin.reactor.kotlin.extensions)
 
-    runtimeOnly(libs.io.micrometer.micrometer.registry.prometheus)
+    runtimeOnly(libs.io.micrometer.registry.prometheus)
 
     testImplementation(libs.org.springframework.boot.spring.boot.starter.test)
     testImplementation(libs.org.springframework.boot.spring.boot.testcontainers)
 
     testImplementation(libs.io.projectreactor.reactor.test)
 
-    testImplementation(libs.io.kotest.kotest.runner.junit5)
-    testImplementation(libs.io.kotest.kotest.assertions.core)
-    testImplementation(libs.io.kotest.kotest.property)
+    testImplementation(libs.io.kotest.runner.junit5)
+    testImplementation(libs.io.kotest.assertions.core)
+    testImplementation(libs.io.kotest.property)
 
-    testImplementation(libs.io.kotest.extensions.kotest.extensions.spring)
-    testImplementation(libs.io.kotest.extensions.kotest.extensions.testcontainers)
+    testImplementation(libs.io.kotest.extensions.spring)
+    testImplementation(libs.io.kotest.extensions.testcontainers)
 
-    testImplementation(libs.io.micrometer.micrometer.tracing.test)
-    testImplementation(libs.io.micrometer.micrometer.observation.test)
+    testImplementation(libs.io.micrometer.tracing.test)
+    testImplementation(libs.io.micrometer.observation.test)
     testImplementation(libs.io.mockk)
 }
 

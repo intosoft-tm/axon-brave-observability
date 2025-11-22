@@ -27,158 +27,172 @@ import org.axonframework.messaging.Message
 import org.axonframework.tracing.SpanAttributesProvider
 import java.util.Collections
 
-class BraveSpanFactoryTest : BehaviorSpec(
-    {
+class BraveSpanFactoryTest :
+    BehaviorSpec(
+        {
 
-        isolationMode = IsolationMode.InstancePerLeaf
+            isolationMode = IsolationMode.InstancePerLeaf
 
-        context("span factory is available") {
-            given("message is created") {
-                val observation: Observation = mockk()
-                val observationRegistry: ObservationRegistry = mockk()
-                val braveSpanFactory = BraveSpanFactory(observationRegistry)
+            context("span factory is available") {
+                given("message is created") {
+                    val observation: Observation = mockk()
+                    val observationRegistry: ObservationRegistry = mockk()
+                    val braveSpanFactory = BraveSpanFactory(observationRegistry)
 
-                val message = GenericEventMessage.asEventMessage<Any>("sample-event")
+                    val message = GenericEventMessage.asEventMessage<Any>("sample-event")
 
-                every {
-                    observation.context
-                } returns
-                    AxonMessageDispatcherContext(message.payloadType.name, "test").also {
-                        it.carrier?.set("trace-id", "00000000")
-                    }
-                every { observationRegistry.currentObservation } returns observation
+                    every {
+                        observation.context
+                    } returns
+                        AxonMessageDispatcherContext(message.payloadType.name, "test").also {
+                            it.carrier?.set("trace-id", "00000000")
+                        }
+                    every { observationRegistry.currentObservation } returns observation
 
-                `when`("factory propagates context to message") {
-                    val messageWithPropagatedContext: EventMessage<Any> = braveSpanFactory.propagateContext(message)
+                    `when`("factory propagates context to message") {
+                        val messageWithPropagatedContext: EventMessage<Any> = braveSpanFactory.propagateContext(message)
 
-                    then("metadata is injected to the message") {
-                        messageWithPropagatedContext.metaData["trace-id"]!!.shouldBeEqual("00000000")
-                    }
-                }
-            }
-
-            given("observation registry is created") {
-                val observationRegistry: ObservationRegistry = TestObservationRegistry.create()
-
-                val tracer: Tracing = createTracer()
-                val braveTracer = createBraveTracer(tracer)
-
-                observationRegistry.addObservationHandlers(braveTracer, tracer)
-
-                val parentSpan = "44616e69656c2057"
-                val traceId = "697320746f74616c207375636b657221-$parentSpan-1"
-
-                val message: Message<*> =
-                    GenericEventMessage.asEventMessage<Any>("my-event")
-                        .andMetaData(Collections.singletonMap("b3", traceId))
-
-                `when`("handler span and root trace is started and made current") {
-                    BraveSpanFactory(observationRegistry)
-                        .createChildHandlerSpan({ "my-span" }, message).start().makeCurrent()
-
-                    BraveSpanFactory(observationRegistry)
-                        .createRootTrace { "root-trace" }
-                        .start()
-                        .makeCurrent()
-
-                    then("parent is not set to parent observation and context kind is internal") {
-                        assertThat(observationRegistry.currentObservation!!.contextView.parentObservation).isNull()
-                        assertThat(
-                            observationRegistry.currentObservation!!.context
-                        ).isInstanceOf(AxonMessageInternalContext::class.java)
-                        assertThat(braveTracer.currentSpan().context().parentId()).isNotEqualTo(parentSpan)
+                        then("metadata is injected to the message") {
+                            messageWithPropagatedContext.metaData["trace-id"]!!.shouldBeEqual("00000000")
+                        }
                     }
                 }
 
-                `when`("handler span is created, started and made current") {
-                    BraveSpanFactory(observationRegistry)
-                        .createChildHandlerSpan({ "my-span" }, message).start().makeCurrent()
+                given("observation registry is created") {
+                    val observationRegistry: ObservationRegistry = TestObservationRegistry.create()
 
-                    then("parent span is set") {
-                        assertThat(observationRegistry.currentObservation!!.contextView.parentObservation).isNotNull()
-                        assertThat(braveTracer.currentSpan().context().parentId()).isEqualTo(parentSpan)
+                    val tracer: Tracing = createTracer()
+                    val braveTracer = createBraveTracer(tracer)
+
+                    observationRegistry.addObservationHandlers(braveTracer, tracer)
+
+                    val parentSpan = "44616e69656c2057"
+                    val traceId = "697320746f74616c207375636b657221-$parentSpan-1"
+
+                    val message: Message<*> =
+                        GenericEventMessage
+                            .asEventMessage<Any>("my-event")
+                            .andMetaData(Collections.singletonMap("b3", traceId))
+
+                    `when`("handler span and root trace is started and made current") {
+                        BraveSpanFactory(observationRegistry)
+                            .createChildHandlerSpan({ "my-span" }, message)
+                            .start()
+                            .makeCurrent()
+
+                        BraveSpanFactory(observationRegistry)
+                            .createRootTrace { "root-trace" }
+                            .start()
+                            .makeCurrent()
+
+                        then("parent is not set to parent observation and context kind is internal") {
+                            assertThat(observationRegistry.currentObservation!!.contextView.parentObservation).isNull()
+                            assertThat(
+                                observationRegistry.currentObservation!!.context
+                            ).isInstanceOf(AxonMessageInternalContext::class.java)
+                            assertThat(braveTracer.currentSpan()!!.context().parentId()).isNotEqualTo(parentSpan)
+                        }
+                    }
+
+                    `when`("handler span is created, started and made current") {
+                        BraveSpanFactory(observationRegistry)
+                            .createChildHandlerSpan({ "my-span" }, message)
+                            .start()
+                            .makeCurrent()
+
+                        then("parent span is set") {
+                            assertThat(
+                                observationRegistry.currentObservation!!.contextView.parentObservation
+                            ).isNotNull()
+                            assertThat(braveTracer.currentSpan()!!.context().parentId()).isEqualTo(parentSpan)
+                        }
+                    }
+
+                    `when`("linked span is created, started and made current") {
+                        BraveSpanFactory(observationRegistry)
+                            .createLinkedHandlerSpan({ "my-span" }, message)
+                            .start()
+                            .makeCurrent()
+
+                        then("parent span is set") {
+                            assertThat(
+                                observationRegistry.currentObservation!!.contextView.parentObservation
+                            ).isNotNull()
+                            assertThat(braveTracer.currentSpan()!!.context().parentId()).isEqualTo(parentSpan)
+                        }
+                    }
+
+                    `when`("dispatch span is created, started and made current") {
+                        val parentObservation = Observation.createNotStarted("my-span", observationRegistry)
+                        BraveSpan(parentObservation).start().makeCurrent()
+                        val parentTraceId = braveTracer.currentSpan()!!.context().traceId()
+                        val parentSpanId = braveTracer.currentSpan()!!.context().spanId()
+
+                        val eventMessage = GenericEventMessage.asEventMessage<Any>("my-event")
+
+                        BraveSpanFactory(observationRegistry)
+                            .createDispatchSpan({ "my-span" }, eventMessage)
+                            .start()
+                            .makeCurrent()
+
+                        then("parent context is set, parent trace is same as current but spans are different") {
+                            assertThat(
+                                observationRegistry.currentObservation!!.contextView.parentObservation
+                            ).isEqualTo(parentObservation)
+                            assertThat(braveTracer.currentSpan()!!.context().traceId()).isEqualTo(parentTraceId)
+                            assertThat(braveTracer.currentSpan()!!.context().spanId()).isNotEqualTo(parentSpanId)
+                        }
                     }
                 }
 
-                `when`("linked span is created, started and made current") {
-                    BraveSpanFactory(observationRegistry)
-                        .createLinkedHandlerSpan({ "my-span" }, message).start().makeCurrent()
+                given("span attribute provider is available") {
+                    val observationRegistry: ObservationRegistry = TestObservationRegistry.create()
+                    val tracer: Tracing = createTracer()
+                    val braveTracer = createBraveTracer(tracer)
 
-                    then("parent span is set") {
-                        assertThat(observationRegistry.currentObservation!!.contextView.parentObservation).isNotNull()
-                        assertThat(braveTracer.currentSpan().context().parentId()).isEqualTo(parentSpan)
+                    observationRegistry.addObservationHandlers(braveTracer, tracer)
+
+                    val spanAttributesProvider: SpanAttributesProvider = mockk()
+                    val braveSpanFactory = BraveSpanFactory(observationRegistry)
+
+                    braveSpanFactory.registerSpanAttributeProvider(spanAttributesProvider)
+                    every { spanAttributesProvider.provideForMessage(any()) } returns sampleAttributes()
+
+                    val message = GenericEventMessage.asEventMessage<Any>("sample-event")
+
+                    `when`("create handler span adds attributes") {
+                        braveSpanFactory.createLinkedHandlerSpan({ "MyRootTrace" }, message).start().makeCurrent()
+
+                        then("attributes are present") {
+                            assertThat(
+                                observationRegistry.currentObservation!!.context.getLowCardinalityKeyValue("MyKey")
+                            ).isNotNull()
+                        }
                     }
-                }
 
-                `when`("dispatch span is created, started and made current") {
-                    val parentObservation = Observation.createNotStarted("my-span", observationRegistry)
-                    BraveSpan(parentObservation).start().makeCurrent()
-                    val parentTraceId = braveTracer.currentSpan().context().traceId()
-                    val parentSpanId = braveTracer.currentSpan().context().spanId()
+                    `when`("create dispatch span adds attributes") {
+                        braveSpanFactory.createDispatchSpan({ "MyRootTrace" }, message).start().makeCurrent()
 
-                    val eventMessage = GenericEventMessage.asEventMessage<Any>("my-event")
-
-                    BraveSpanFactory(observationRegistry)
-                        .createDispatchSpan({ "my-span" }, eventMessage).start().makeCurrent()
-
-                    then("parent context is set, parent trace is same as current but spans are different") {
-                        assertThat(
-                            observationRegistry.currentObservation!!.contextView.parentObservation
-                        ).isEqualTo(parentObservation)
-                        assertThat(braveTracer.currentSpan().context().traceId()).isEqualTo(parentTraceId)
-                        assertThat(braveTracer.currentSpan().context().spanId()).isNotEqualTo(parentSpanId)
+                        then("attributes are present") {
+                            assertThat(
+                                observationRegistry.currentObservation!!.context.getLowCardinalityKeyValue("MyKey")
+                            ).isNotNull()
+                        }
                     }
-                }
-            }
 
-            given("span attribute provider is available") {
-                val observationRegistry: ObservationRegistry = TestObservationRegistry.create()
-                val tracer: Tracing = createTracer()
-                val braveTracer = createBraveTracer(tracer)
+                    `when`("create internal span adds attributes") {
+                        braveSpanFactory.createInternalSpan({ "MyRootTrace" }, message).start().makeCurrent()
 
-                observationRegistry.addObservationHandlers(braveTracer, tracer)
-
-                val spanAttributesProvider: SpanAttributesProvider = mockk()
-                val braveSpanFactory = BraveSpanFactory(observationRegistry)
-
-                braveSpanFactory.registerSpanAttributeProvider(spanAttributesProvider)
-                every { spanAttributesProvider.provideForMessage(any()) } returns sampleAttributes()
-
-                val message = GenericEventMessage.asEventMessage<Any>("sample-event")
-
-                `when`("create handler span adds attributes") {
-                    braveSpanFactory.createLinkedHandlerSpan({ "MyRootTrace" }, message).start().makeCurrent()
-
-                    then("attributes are present") {
-                        assertThat(
-                            observationRegistry.currentObservation!!.context.getLowCardinalityKeyValue("MyKey")
-                        ).isNotNull()
-                    }
-                }
-
-                `when`("create dispatch span adds attributes") {
-                    braveSpanFactory.createDispatchSpan({ "MyRootTrace" }, message).start().makeCurrent()
-
-                    then("attributes are present") {
-                        assertThat(
-                            observationRegistry.currentObservation!!.context.getLowCardinalityKeyValue("MyKey")
-                        ).isNotNull()
-                    }
-                }
-
-                `when`("create internal span adds attributes") {
-                    braveSpanFactory.createInternalSpan({ "MyRootTrace" }, message).start().makeCurrent()
-
-                    then("attributes are present") {
-                        assertThat(
-                            observationRegistry.currentObservation!!.context.getLowCardinalityKeyValue("MyKey")
-                        ).isNotNull()
+                        then("attributes are present") {
+                            assertThat(
+                                observationRegistry.currentObservation!!.context.getLowCardinalityKeyValue("MyKey")
+                            ).isNotNull()
+                        }
                     }
                 }
             }
         }
-    }
-) {
+    ) {
     companion object {
         private fun createBraveTracer(tracer: Tracing) =
             BraveTracer(
@@ -187,26 +201,26 @@ class BraveSpanFactoryTest : BehaviorSpec(
             )
 
         private fun createTracer(): Tracing =
-            Tracing.newBuilder()
+            Tracing
+                .newBuilder()
                 .propagationFactory(
                     B3Propagation.newFactoryBuilder().injectFormat(B3Propagation.Format.SINGLE).build()
-                )
-                .traceId128Bit(true)
+                ).traceId128Bit(true)
                 .build()
 
         private fun ObservationRegistry.addObservationHandlers(
             braveTracer: BraveTracer,
             tracer: Tracing
         ) {
-            this.observationConfig()
+            this
+                .observationConfig()
                 .observationHandler(DefaultTracingObservationHandler(braveTracer))
                 .observationHandler(
                     PropagatingReceiverTracingObservationHandler<ReceiverContext<*>>(
                         braveTracer,
                         BravePropagator(tracer)
                     )
-                )
-                .observationHandler(
+                ).observationHandler(
                     PropagatingSenderTracingObservationHandler<SenderContext<*>>(braveTracer, BravePropagator(tracer))
                 )
         }
