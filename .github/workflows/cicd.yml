@@ -20,6 +20,4 @@ jobs:
   gradle-pipeline:
     name: ▶️
     uses: intosoft-tm/github-actions-starter/.github/workflows/gradle.lib.yml@main
-    with:
-      actions-branch: main
     secrets: inherit

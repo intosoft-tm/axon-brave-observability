@@ -28,14 +28,13 @@ enum class AxonHandlerObservation : ObservationDocumentation {
     }
 
     class DefaultAxonHandlerObservationConvention : AxonHandlerObservationConvention {
-        override fun getLowCardinalityKeyValues(context: AxonMessageHandlerContext): KeyValues {
-            return KeyValues.of(
+        override fun getLowCardinalityKeyValues(context: AxonMessageHandlerContext): KeyValues =
+            KeyValues.of(
                 ListenerLowCardinalityTags.HANDLER_PAYLOAD.asString(),
                 context.payload,
                 ListenerLowCardinalityTags.HANDLER_OPERATION.asString(),
                 context.operationName
             )
-        }
 
         override fun getContextualName(context: AxonMessageHandlerContext) =
             ContextualNameConverter.camelAndDotToSpaceSeparated(context.operationName)

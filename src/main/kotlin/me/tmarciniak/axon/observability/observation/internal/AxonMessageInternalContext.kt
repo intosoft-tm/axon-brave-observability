@@ -10,7 +10,6 @@ class AxonMessageInternalContext(
     val payloadName: String?,
     val operationName: String,
     private val isRootTrace: Boolean
-) :
-    Observation.Context() {
+) : Observation.Context() {
     override fun getParentObservation(): ObservationView? = if (isRootTrace) null else super.getParentObservation()
 }

@@ -29,7 +29,8 @@ enum class AxonInternalObservation : ObservationDocumentation {
 
     class DefaultAxonInternalObservationConvention : AxonInternalObservationConvention {
         override fun getLowCardinalityKeyValues(context: AxonMessageInternalContext): KeyValues =
-            KeyValues.of(SenderLowCardinalityTags.INTERNAL_OPERATION.withValue(context.operationName))
+            KeyValues
+                .of(SenderLowCardinalityTags.INTERNAL_OPERATION.withValue(context.operationName))
                 .and(
                     context.payloadName?.let {
                         SenderLowCardinalityTags.INTERNAL_PAYLOAD.withValue(context.payloadName)
